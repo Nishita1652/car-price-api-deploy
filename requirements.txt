@@ -1,0 +1,10 @@
+# --- Server ---
+fastapi
+uvicorn[standard]
+
+# --- ML & Data ---
+pandas
+numpy
+joblib
+scikit-learn
+catboost
