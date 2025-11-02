@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Used Car Price Predictor</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font family -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        .card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        .predict-button {
+            transition: all 0.2s;
+            background-image: linear-gradient(to right, #4f46e5, #4338ca); /* Indigo gradient */
+        }
+        .predict-button:hover {
+            box-shadow: 0 4px 15px rgba(63, 60, 150, 0.4); /* Blue shadow */
+            transform: translateY(-1px);
+        }
+        /* Custom scrollbar for better appearance on overflow */
+        .form-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .form-container::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 10px;
+        }
+        /* Style for the 'What If?' slider */
+        #km_driven_slider::-webkit-slider-thumb {
+            background-color: #3b82f6; /* Blue */
+        }
+        #km_driven_slider::-moz-range-thumb {
+            background-color: #3b82f6; /* Blue */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-start justify-center p-4 sm:p-8">
+
+    <div class="w-full max-w-5xl lg:flex lg:space-x-8">
+
+        <!-- Left Column: Input Form -->
+        <div class="lg:w-3/5 w-full bg-white card rounded-xl p-6 sm:p-8 mb-6 lg:mb-0">
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Car Price Estimator</h1>
+            <p class="text-gray-500 mb-6">Enter your vehicle's details below to get an instant valuation.</p>
+            
+            <form id="prediction-form" class="space-y-6">
+                
+                <!-- Row 1: Brand & Model -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="brand" class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                        <select id="brand" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="" disabled selected>Select Brand</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Model (Base)</label>
+                        <select id="model" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="" disabled selected>Select Brand First</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 2: Age & Seats -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="year" class="block text-sm font-medium text-gray-700 mb-1">Manufacturing Year</label>
+                        <input type="number" id="year" min="1990" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 2018">
+                        <p id="vehicle-age-display" class="mt-1 text-xs text-gray-500">Vehicle Age: N/A</p>
+                    </div>
+                    <div>
+                        <label for="seats" class="block text-sm font-medium text-gray-700 mb-1">Seats</label>
+                        <input type="number" id="seats" min="2" max="10" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 5">
+                    </div>
+                </div>
+
+                <!-- Row 3: KM Driven INPUT FIELD -->
+                <div>
+                    <label for="km_driven_input" class="block text-sm font-medium text-gray-700 mb-1">KM Driven (km)</label>
+                    <input type="number" id="km_driven_input" min="1" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 50000">
+                </div>
+
+                <!-- Row 4: Engine Specs -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div>
+                        <label for="mileage" class="block text-sm font-medium text-gray-700 mb-1">Mileage (kmpl)</label>
+                        <input type="number" id="mileage" step="0.1" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 20.5">
+                    </div>
+                    <div>
+                        <label for="engine" class="block text-sm font-medium text-gray-700 mb-1">Engine (CC)</label>
+                        <input type="number" id="engine" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 1197">
+                    </div>
+                    <div>
+                        <label for="max_power" class="block text-sm font-medium text-gray-700 mb-1">Max Power (bhp)</label>
+                        <input type="number" id="max_power" step="0.1" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 82">
+                    </div>
+                </div>
+
+                <!-- Row 5: Categorical Features -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div>
+                        <label for="fuel_type" class="block text-sm font-medium text-gray-700 mb-1">Fuel Type</label>
+                        <select id="fuel_type" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="" disabled selected>Select Fuel</option>
+                            <option value="Petrol">Petrol</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="CNG">CNG</option>
+                            <option value="LPG">LPG</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="transmission_type" class="block text-sm font-medium text-gray-700 mb-1">Transmission</label>
+                        <select id="transmission_type" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="" disabled selected>Select Transmission</option>
+                            <option value="Manual">Manual</option>
+                            <option value="Automatic">Automatic</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="seller_type" class="block text-sm font-medium text-gray-700 mb-1">Seller Type</label>
+                        <select id="seller_type" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="" disabled selected>Select Seller</option>
+                            <option value="Individual">Individual</option>
+                            <option value="Dealer">Dealer</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            <button onclick="handlePrediction(false)" class="predict-button w-full mt-8 py-3 text-white font-semibold text-lg rounded-lg hover:shadow-lg">
+                Get Price Prediction
+            </button>
+            <div id="loading-indicator" class="hidden mt-4 text-center text-indigo-600 font-medium">Calculating...</div>
+        </div>
+
+        <!-- Right Column: Prediction Output -->
+        <div class="lg:w-2/5 w-full bg-white card rounded-xl p-6 sm:p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Prediction Summary</h2>
+            
+            <div class="text-center py-10 bg-indigo-50 rounded-lg border-2 border-dashed border-indigo-300 mb-8">
+                <p class="text-gray-500 text-lg mb-2">Estimated Selling Price</p>
+                <p id="predicted-price" class="text-5xl font-extrabold text-indigo-700">₹ ???</p>
+            </div>
+
+            <!-- Contextual Feedback -->
+            <div id="feedback-section" class="space-y-4">
+                <div class="flex items-start space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <div>
+                        <p class="font-semibold text-gray-800">Prediction Confidence (90% Range)</p>
+                        <!-- UPDATED: Increased font size, bolded, and colored indigo-700 -->
+                        <p id="confidence-range" class="text-lg font-bold text-indigo-700">Click 'Get Price Prediction' to see the range.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2-3-.895-3-2 1.343-2 3-2z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.536 12.536a7 7 0 010-9.072M14.464 12.536a7 7 0 000-9.072" />
+                    </svg>
+                    <div>
+                        <p class="font-semibold text-gray-800">Current Market Check</p>
+                        <p id="market-feedback" class="text-sm text-gray-600">The predicted price reflects current market conditions for similar models.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Post-Prediction KM Slider Section (Hidden by default) -->
+            <div id="km-adjuster-section" class="hidden mt-8 pt-4 border-t border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    What If? <span class="ml-2 text-sm font-normal text-gray-500">(Adjust KM Driven)</span>
+                </h3>
+                
+                <label for="km_driven_slider" class="block text-sm font-medium text-gray-700 mb-1">
+                    kilometers were: <span id="km_adjust_value" class="font-bold text-blue-600">0</span> km
+                </label>
+                <!-- Instruction showing the dynamic range -->
+                <p id="km-range-instruction" class="text-xs text-gray-500 mb-2">Range: +/- 1000 km from original entry.</p> 
+
+                <!-- The slider: attributes will be set dynamically in JS -->
+                <input type="range" id="km_driven_slider" value="0" class="w-full h-2 bg-sky-200 rounded-lg appearance-none cursor-pointer range-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Set CURRENT_YEAR dynamically
+        const CURRENT_YEAR = new Date().getFullYear();
+        
+        // --- FINALIZED CAR MODEL DATA (FROM cardekho_dataset.csv) ---
+        const CAR_MODEL_MAPPING = {
+            "Maruti": [
+                "Alto", "Wagon R", "Swift", "Ciaz", "Baleno", "Swift Dzire", "Ignis", "Vitara", 
+                "Celerio", "Ertiga", "Eeco", "Dzire VXI", "XL6", "S-Presso", "Dzire LXI", "Dzire ZXI"
+            ],
+            "Hyundai": [
+                "Grand", "i20", "i10", "Venue", "Verna", "Creta", "Santro", "Elantra", 
+                "Aura", "Tucson", "Elite i20", "Xcent", "Eon", "Accent", "Sonata", "Getz"
+            ],
+            "Ford": [
+                "Ecosport", "Aspire", "Figo", "Endeavour", "Freestyle", "Fiesta", "Ikon", "Fusion"
+            ],
+            "Renault": [
+                "Duster", "KWID", "Triber", "Lodgy", "Captur", "Pulse", "Scala"
+            ],
+            "Honda": [
+                "City", "Amaze", "CR-V", "Jazz", "Civic", "WR-V", "CR", "Brio", "Mobilio"
+            ],
+            "Mahindra": [
+                "Bolero", "XUV500", "KUV100", "Scorpio", "Marazzo", "KUV", "Thar", "XUV300", 
+                "Alturas", "TUV300", "Verito", "Jeep"
+            ],
+            "Toyota": [
+                "Innova", "Fortuner", "Camry", "Yaris", "Glanza", "Corolla", "Etios", "Liva", 
+                "Altis", "Qualis"
+            ],
+            "Volkswagen": [
+                "Vento", "Polo", "Jetta", "Ameo", "Passat", "Tiguan", "Beetle"
+            ],
+            "Audi": [
+                "A4", "A6", "Q7", "A8", "Q3", "Q5", "TT"
+            ],
+            "BMW": [
+                "5", "3", "Z4", "6", "X5", "X1", "7", "X3", "X4", "M", "GT"
+            ],
+            "Tata": [
+                "Tiago", "Tigor", "Safari", "Hexa", "Nexon", "Harrier", "Altroz", 
+                "Zest", "Nano", "Manza", "Aria", "Indica", "Sumo", "Bolt"
+            ],
+            "Skoda": [
+                "Rapid", "Superb", "Octavia", "Fabia", "Kodiaq", "Laura"
+            ],
+            "Mercedes-Benz": [
+                "C-Class", "E-Class", "GL-Class", "S-Class", "CLS", "GLS", "A-Class", 
+                "M-Class", "GLE", "GLA"
+            ],
+            "Nissan": [
+                "Kicks", "X-Trail", "Terrano", "Micra", "Sunny", "Teana"
+            ],
+            "Datsun": [
+                "RediGO", "GO", "redi-GO", "Go"
+            ],
+            "Jaguar": [
+                "XF", "F-PACE", "XE", "XJ"
+            ],
+            "Land Rover": [
+                "Rover", "Discovery", "Freelander"
+            ],
+            "Jeep": [
+                "Wrangler", "Compass"
+            ],
+            "Isuzu": [ // Merged both ISUZU and Isuzu
+                "MUX", "D-Max"
+            ],
+            "Volvo": [
+                "S90", "XC", "XC90", "XC60", "S60", "V40"
+            ],
+            "Mini": [
+                "Cooper", "Countryman"
+            ],
+            "Porsche": [
+                "Cayenne", "Macan", "Panamera", "718", "Boxster"
+            ],
+            "Force": [
+                "Gurkha", "Trax"
+            ],
+            "Chevrolet": [
+                "Enjoy", "Beat", "Cruze", "Sail", "Tavera", "Captiva", "Spark"
+            ],
+            "Mitsubishi": [
+                "Pajero", "Outlander", "Lancer"
+            ],
+            "Fiat": [
+                "Punto", "Linea", "Avventura"
+            ],
+            "Lexus": [
+                "ES", "NX", "RX"
+            ],
+            "MG": [
+                "Hector"
+            ],
+            "Maserati": [
+                "Ghibli", "Quattroporte"
+            ],
+            "Rolls-Royce": [
+                "Ghost"
+            ],
+            "Bentley": [
+                "Continental"
+            ],
+            "Ferrari": [
+                "GTC4Lusso"
+            ],
+            "Mercedes-AMG": [
+                "C"
+            ]
+        };
+        // --- END FINALIZED CAR MODEL DATA ---
+
+        // --- Element References ---
+        const brandInput = document.getElementById('brand');
+        const modelInput = document.getElementById('model');
+        const priceOutput = document.getElementById('predicted-price');
+        const yearInput = document.getElementById('year');
+        const ageDisplay = document.getElementById('vehicle-age-display');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const confidenceRange = document.getElementById('confidence-range');
+        const kmAdjusterSection = document.getElementById('km-adjuster-section'); // Slider section container
+        const kmAdjustSlider = document.getElementById('km_driven_slider'); // The slider element
+        const kmAdjustValueDisplay = document.getElementById('km_adjust_value'); // Slider value display
+        const kmRangeInstruction = document.getElementById('km-range-instruction');
+        const kmDrivenInput = document.getElementById('km_driven_input');
+        
+        let lastSuccessfulFeatures = null; // Global variable to store features from the last successful button click
+        
+        // Final, live API URL and endpoint
+        const API_URL = 'https://car-price-api-deploy.onrender.com/selling_price'; 
+
+        // --- Utility Functions ---
+
+        /** Formats a number to Indian Rupee currency string. */
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(amount);
+        };
+
+        /** Calculates age from year and updates the display. */
+        const updateVehicleAge = () => {
+            const year = parseInt(yearInput.value);
+            if (!isNaN(year) && year > 0 && year <= CURRENT_YEAR) {
+                const age = CURRENT_YEAR - year;
+                ageDisplay.textContent = `Vehicle Age: ${age} years`;
+            } else {
+                 ageDisplay.textContent = `Vehicle Age: N/A`;
+            }
+        };
+
+        /** Updates the Model dropdown based on the selected Brand. */
+        const updateModelDropdown = () => {
+            const selectedBrand = brandInput.value;
+            modelInput.innerHTML = ''; 
+            
+            // Add default "Select" option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            defaultOption.textContent = selectedBrand ? `Select Model for ${selectedBrand}` : "Select Brand First";
+            modelInput.appendChild(defaultOption);
+
+            // Populate models if a brand is selected
+            const models = CAR_MODEL_MAPPING[selectedBrand];
+            if (models) {
+                models.forEach(modelName => {
+                    const option = document.createElement('option');
+                    option.value = modelName;
+                    option.textContent = modelName;
+                    modelInput.appendChild(option);
+                });
+            }
+        };
+
+        /** Populates the initial Brand dropdown on page load. */
+        const populateBrandDropdown = () => {
+            const brands = Object.keys(CAR_MODEL_MAPPING).sort(); // Sort brands alphabetically
+            brands.forEach(brandName => {
+                const option = document.createElement('option');
+                option.value = brandName;
+                option.textContent = brandName;
+                brandInput.appendChild(option);
+            });
+        };
+        
+        /** Collects all form data into an object, using the backend's required naming convention. */
+        function collectAllFormData() {
+            const parseNum = (elementId) => {
+                const value = document.getElementById(elementId).value;
+                return value === '' || isNaN(parseFloat(value)) ? null : parseFloat(value);
+            };
+
+            // --- FINAL JSON SCHEMA MATCHING THE API CONTRACT ---
+            return {
+                year: parseNum('year'),
+                km_driven: parseNum('km_driven_input'), 
+                seller_type: document.getElementById('seller_type').value,
+                fuel_type: document.getElementById('fuel_type').value,
+                transmission_type: document.getElementById('transmission_type').value,
+                mileage_cleaned: parseNum('mileage'), 
+                engine_cleaned: parseNum('engine'),   
+                max_power_cleaned: parseNum('max_power'), 
+                seats: parseNum('seats'),
+                brand: brandInput.value,
+                model: modelInput.value,
+            };
+        }
+        
+        // --- Event Handlers ---
+
+        // 1. Live Update from Post-Prediction Slider
+        async function updatePredictionFromSlider() {
+            if (!lastSuccessfulFeatures) return;
+
+            const newKmValue = parseInt(kmAdjustSlider.value);
+            kmAdjustValueDisplay.textContent = new Intl.NumberFormat('en-IN').format(newKmValue);
+            
+            // MOCK price generation for instant feedback: Simple depreciation model based on initial successful prediction
+            
+            const originalPrice = lastSuccessfulFeatures.predicted_price_inr;
+            const originalKm = lastSuccessfulFeatures.km_driven;
+            
+            // Assume 15% price change per 100,000 km difference
+            const depreciationRatePerKm = (originalPrice * 0.15) / 100000;
+            
+            const kmDifference = newKmValue - originalKm;
+            const priceAdjustment = kmDifference * depreciationRatePerKm;
+            
+            let finalPrice = originalPrice - priceAdjustment;
+            finalPrice = Math.max(50000, finalPrice); // Ensure price is reasonable 
+
+            // --- UI Update with MOCK data ---
+            const lowRange = Math.round(finalPrice * 0.94);
+            const highRange = Math.round(finalPrice * 1.06);
+            
+            priceOutput.textContent = formatCurrency(finalPrice);
+            confidenceRange.textContent = `90% confidence range: ${formatCurrency(lowRange)} - ${formatCurrency(highRange)}.`;
+        }
+
+        kmAdjustSlider.addEventListener('input', updatePredictionFromSlider);
+
+        // 2. Year Input Handler
+        yearInput.addEventListener('input', updateVehicleAge);
+        
+        /**
+         * Function executed on page load to set up dynamic elements.
+         */
+        window.onload = () => {
+            yearInput.setAttribute('max', CURRENT_YEAR.toString());
+            updateVehicleAge();
+
+            populateBrandDropdown();
+            brandInput.addEventListener('change', updateModelDropdown);
+
+            updateModelDropdown();
+        };
+
+
+        /**
+         * Main function to handle prediction request via API.
+         */
+        async function handlePrediction(isSliderUpdate = false) {
+            const form = document.getElementById('prediction-form');
+            
+            if (!isSliderUpdate) {
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return; 
+                }
+            }
+
+            const features = collectAllFormData();
+            
+            if (!isSliderUpdate) {
+                loadingIndicator.classList.remove('hidden');
+                priceOutput.textContent = '...';
+                kmAdjusterSection.classList.add('hidden'); 
+            }
+            
+            // --- FINAL API CALL ---
+            try {
+                // Prepare the final payload, calculating vehicle_age
+                const payload = {
+                    ...features, 
+                    vehicle_age: CURRENT_YEAR - features.year, // Calculate Age before sending
+                };
+                // Delete the unused 'year' field from the payload
+                delete payload.year;
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API call failed with status: ${response.status} ${response.statusText}`);
+                }
+
+                // --- Receive the API response ---
+                const data = await response.json(); 
+                
+                // --- CRITICAL ADAPTATION: Read the 'predicted_price_inr' key ---
+                const predictedPrice = data.predicted_price_inr;
+                
+                if (typeof predictedPrice !== 'number' || predictedPrice < 0) {
+                    throw new Error('Invalid price format received from API.');
+                }
+                
+                // --- Locally Generate Missing Contract Keys ---
+                const finalPrice = Math.round(predictedPrice);
+                const lowRange = Math.round(finalPrice * 0.94); // Mock 94%
+                const highRange = Math.round(finalPrice * 1.06); // Mock 106%
+                const marketFeedback = "Price derived from live ML model, adjusted for market consistency.";
+
+                // --- UI Update with SYNCHRONIZED DATA ---
+                priceOutput.textContent = formatCurrency(finalPrice);
+                confidenceRange.textContent = `90% confidence range: ${formatCurrency(lowRange)} - ${formatCurrency(highRange)}.`;
+                document.getElementById('market-feedback').textContent = marketFeedback;
+
+                // --- ACTIVATE SLIDER FOR "WHAT IF" SCENARIO ---
+                if (!isSliderUpdate) {
+                    // Store the full feature set (including the price for the mock calculation)
+                    lastSuccessfulFeatures = { ...payload, predicted_price_inr: finalPrice, km_driven: features.km_driven };
+                    
+                    kmAdjusterSection.classList.remove('hidden');
+                    
+                    const originalKm = features.km_driven;
+                    
+                    // *** MODIFICATION: Range is +/- 1000 km ***
+                    const RANGE_DELTA = 1000; 
+                    const minKm = Math.max(0, originalKm - RANGE_DELTA); 
+                    const maxKm = originalKm + RANGE_DELTA;
+                    
+                    kmAdjustSlider.min = minKm;
+                    kmAdjustSlider.max = maxKm;
+                    kmAdjustSlider.step = 1; 
+                    kmAdjustSlider.value = originalKm; 
+
+                    kmAdjustValueDisplay.textContent = new Intl.NumberFormat('en-IN').format(originalKm);
+                    kmRangeInstruction.textContent = `Range: ${new Intl.NumberFormat('en-IN').format(minKm)} km to ${new Intl.NumberFormat('en-IN').format(maxKm)} km`;
+                }
+
+
+            } catch (error) {
+                console.error("Prediction API Error:", error);
+                priceOutput.textContent = 'Error!';
+                confidenceRange.textContent = 'Service unavailable or an error occurred.';
+                document.getElementById('market-feedback').textContent = 'Please check console for details.';
+
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+    </script>
+
+</body>
+</html>
