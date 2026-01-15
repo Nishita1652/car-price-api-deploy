@@ -19,13 +19,6 @@ function App() {
   const [lastSuccessfulFeatures, setLastSuccessfulFeatures] = useState(null);
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
   const [marketInsight, setMarketInsight] = useState("");
-  const isFormInvalid = 
-  !formData.brand || 
-  !formData.model || 
-  !formData.km_driven_input || 
-  !formData.engine || 
-  !formData.mileage || 
-  !formData.max_power;
 
   const formatNumber = (val) => val ? parseInt(val).toLocaleString('en-IN') : "";
 
@@ -163,11 +156,11 @@ function App() {
           </div>
 
 <button 
-    className={`predict-button ${loading || isFormInvalid ? 'disabled' : ''}`} 
+    className={`predict-button ${loading ? 'disabled' : ''}`} 
     onClick={getPrediction} 
-    disabled={loading || isFormInvalid}
+    disabled={loading}
   >
-    {loading ? 'Analyzing Market...' : isFormInvalid ? 'Fill All Fields' : 'Get Price Prediction'}
+    {loading ? 'Analyzing Market...' :  'Get Price Prediction'}
   </button>
         </div>
 
