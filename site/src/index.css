@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f3f4f6; /* Your original light gray background */
+  font-family: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box; /* Ensures padding doesn't break your layout widths */
+}
