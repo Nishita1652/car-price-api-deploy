@@ -3,7 +3,7 @@ import './App.css';
 import { CAR_MODEL_MAPPING } from './constants';
 
 const CURRENT_YEAR = new Date().getFullYear();
-const API_URL = 'https://car-price-api-deploy.onrender.com/selling_price';
+const API_URL = 'https://car-price-api-deploy.onrender.com';
 const YEARS_LIST = Array.from({ length: 26 }, (_, i) => CURRENT_YEAR - i);
 
 function App() {
