@@ -19,6 +19,7 @@ function App() {
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
   const [kmAdjustment, setKmAdjustment] = useState(0);
+  const [marketInsight, setMarketInsight] = useState("");
 
   const getLogoPath = (brand) => {
     if (!brand) return "";
@@ -106,6 +107,7 @@ const updatePrice = async (adjustedKm) => {
 
     if (data.predicted_price_inr) {
       setPrediction(Math.round(data.predicted_price_inr));
+      setMarketInsight(generateInsight(adjustedKm, formData.year, formData.brand));
     }
   } catch (err) {
     console.error("Slider API Error:", err);
@@ -137,9 +139,19 @@ const updatePrice = async (adjustedKm) => {
         setPrediction(Math.round(data.predicted_price_inr));
         setLoading(false);
         setIsResultModalOpen(true);
+        setMarketInsight(generateInsight(parseFloat(formData.km_driven_input), formData.year, formData.brand));
       }, 1500);
     } catch (err) { setLoading(false); }
   };
+  
+  const generateInsight = (km, year, brand) => {
+  const age = CURRENT_YEAR - year;
+  if (km > 100000) return "High mileage is the primary factor lowering this valuation.";
+  if (age > 12) return "Vehicle age may affect financing options for buyers.";
+  if (['Audi', 'BMW', 'Mercedes-Benz', 'Jaguar', 'Porsche'].includes(brand)) 
+    return "Luxury brand status helps maintain a strong base resale value.";
+  return "This model currently shows stable demand in the pre-owned market.";
+};
 
   return (
     <div className="main-container">
@@ -174,9 +186,9 @@ const updatePrice = async (adjustedKm) => {
               </select>
             </div>
 
-            <div className="form-group"><label>Mileage (kmpl)</label><input type="number" id="mileage" onChange={handleInputChange} /></div>
-            <div className="form-group"><label>Engine (CC)</label><input type="number" id="engine" onChange={handleInputChange} /></div>
-            <div className="form-group"><label>Max Power (bhp)</label><input type="number" id="max_power" onChange={handleInputChange} /></div>
+            <div className="form-group"><label>Mileage (kmpl)</label><input type="number" id="mileage" placeholder="eg: 40" onChange={handleInputChange} /></div>
+            <div className="form-group"><label>Engine (CC)</label><input type="number" id="engine" placeholder="eg: 300" onChange={handleInputChange} /></div>
+            <div className="form-group"><label>Max Power (bhp)</label><input type="number" id="max_power" placeholder="eg: 500" onChange={handleInputChange} /></div>
 
             <div className="form-group">
               <label>Seats</label>
@@ -187,7 +199,7 @@ const updatePrice = async (adjustedKm) => {
               </div>
             </div>
 
-            <div className="form-group full-width"><label>KM Driven</label><input type="number" id="km_driven_input" value={formData.km_driven_input} onChange={handleInputChange} /></div>
+            <div className="form-group full-width"><label>KM Driven</label><input type="number" id="km_driven_input" placeholder="eg: 5000" value={formData.km_driven_input} onChange={handleInputChange} /></div>
 
             {/* RESTORED SELLER TYPE */}
             <div className="form-group"><label>Seller Type</label>
@@ -231,11 +243,14 @@ const updatePrice = async (adjustedKm) => {
             
             <div className="slider-box-container">
               <div className="slider-meta">
-                <span>-100km</span>
+                <span>-5000km</span>
                 <strong>{kmAdjustment > 0 ? `+${kmAdjustment}` : kmAdjustment} km</strong>
-                <span>+100km</span>
+                <span>+5000km</span>
               </div>
-              <input type="range" min="-1000" max="1000" step="25" value={kmAdjustment} onChange={(e) => setKmAdjustment(parseInt(e.target.value))} className="km-custom-slider" />
+              <input type="range" min="-5000" max="5000" step="500" value={kmAdjustment} onChange={(e) => setKmAdjustment(parseInt(e.target.value))} className="km-custom-slider" />
+            </div>
+            <div className="modal-insight">
+                <p>💡 <strong>Market Insight:</strong> {marketInsight}</p>
             </div>
           </div>
         </div>
