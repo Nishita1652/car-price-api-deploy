@@ -43,8 +43,6 @@ background: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
 .form-title {
     color: #4f46e5;
     background: linear-gradient(to right, #4f46e5, #9333ea);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     letter-spacing: 0.5px;
     text-align: center;
     font-weight: 900;
