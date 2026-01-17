@@ -227,6 +227,7 @@ const updatePrice = async (adjustedKm) => {
           <button className="predict-btn" onClick={getPrediction} disabled={loading}>
             {loading ? 'Analyzing...' : 'Calculate Resale Price'}
           </button>
+          <p className='disclaimer'>First use might take some time</p>
         </div>
       </div>
 

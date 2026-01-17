@@ -1,25 +1,27 @@
 :root {
-  --primary: #9333ea;
-  --dark: linear-gradient(to right, #4f46e5, #9333ea);
-  --gray-bg: #f8f9fa;
-  --border: #dfe6e9;
+  /* Updated to subtle reddish tones */
+  --primary: #e11d48; 
+  --dark: linear-gradient(to right, #9f1239, #e11d48);
+  --gray-bg: #fff1f2; /* Very light rose tint */
+  --border: #f1f1f1;
+  --text-main: #4c0519;
 }
 
 body {
   margin: 0;
-  background: #eaeff2;
+  background: #f8fafc;
   font-family: 'Segoe UI', sans-serif;
   transition: all 1s ease;
 }
 
 .main-container {
-min-height: 100vh;
+  min-height: 100vh;
   padding: 40px 20px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  /* Add your background image URL here */
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+  /* Dark overlay with a hint of red-tinted background */
+  background: linear-gradient(rgba(20, 0, 0, 0.75), rgba(20, 0, 0, 0.75)), 
               url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000');
   background-size: cover;
   background-position: center;
@@ -32,7 +34,7 @@ min-height: 100vh;
 }
 
 .card {
-background: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
+  background: rgba(255, 255, 255, 0.95); /* Switched to mostly opaque for a cleaner 'subtle' look */
   backdrop-filter: blur(10px);
   padding: 35px;
   border-radius: 24px;
@@ -41,8 +43,8 @@ background: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
 }
 
 .form-title {
-    color: #4f46e5;
-    background: linear-gradient(to right, #4f46e5, #9333ea);
+    color: #9f1239; /* Deep Rose */
+    background: transparent;
     letter-spacing: 0.5px;
     text-align: center;
     font-weight: 900;
@@ -64,7 +66,7 @@ background: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
   margin-bottom: 6px;
   font-weight: 600;
   font-size: 0.85rem;
-  color: #636e72;
+  color: #881337; /* Muted Red-Gray */
 }
 
 input,
@@ -76,6 +78,7 @@ select,
   border: 2px solid var(--border);
   box-sizing: border-box;
   outline: none;
+  background: white;
 }
 
 .brand-selector-box {
@@ -85,7 +88,6 @@ select,
   justify-content: space-between;
   align-items: center;
 }
-
 
 .selected-content {
   display: flex;
@@ -112,7 +114,8 @@ select,
   width: 35px;
   height: 35px;
   border: none;
-  background-color: rgba(0, 0, 255, 0.733);
+  background-color: #be123c; /* Rose Red */
+  color: white;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
@@ -120,6 +123,7 @@ select,
 
 .cnt-btn:hover {
   transform: scale(1.15);
+  background-color: #9f1212;
 }
 
 .predict-btn {
@@ -132,18 +136,19 @@ select,
   border-radius: 12px;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);
 }
 
 .predict-btn:hover {
-  transform: scale(1.05);
-  background-color: #0c029c;
+  transform: scale(1.02);
+  background: #881337;
 }
 
 /* MODALS */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(30, 0, 0, 0.85); /* Darker reddish overlay */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,7 +187,7 @@ select,
 }
 
 .res-subtitle {
-  color: #b2bec3;
+  color: #94a3b8;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -203,7 +208,7 @@ select,
   justify-content: space-between;
   font-size: 0.75rem;
   margin-bottom: 10px;
-  color: #636e72;
+  color: #881337;
 }
 
 .km-custom-slider {
@@ -214,20 +219,15 @@ select,
 
 /* TIRE */
 .spinning-tire {
-  width: 85px;
-  height: 85px;
+  width: 150px;
+  height: 150px;
   animation: rotateTire 1.5s linear infinite;
   margin-bottom: 15px;
 }
 
 @keyframes rotateTire {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .load-text {
@@ -240,16 +240,17 @@ select,
   top: 15px;
   right: 15px;
   border: none;
-  background: #eee;
+  background: #f1f1f1;
   width: 32px;
   height: 32px;
   border-radius: 50%;
   cursor: pointer;
+  color: #881337;
 }
 
 /* BRAND GRID */
 .brand-picker {
-  background: rgba(0,0,0, 0.2);
+  background: rgba(255, 255, 255, 0.95);
   width: 85%;
   max-width: 480px;
   height: 60vh;
@@ -269,10 +270,11 @@ select,
   flex-direction: column;
   align-items: center;
   padding: 12px;
-  border: 2px solid #525252;
+  border: 2px solid var(--border);
   border-radius: 12px;
   cursor: pointer;
   background-color: white;
+  transition: all 0.2s ease;
 }
 
 .brand-modal-logo {
@@ -281,17 +283,25 @@ select,
   object-fit: contain;
   margin-bottom: 5px;
 }
+
 .brand-option:hover{
-  transform: scale(1.1);
-  border-color: #0c029c;
+  transform: scale(1.05);
+  border-color: var(--primary);
+  background: var(--gray-bg);
 }
+
 .modal-insight {
   margin-top: 25px;
   padding: 15px;
-  background: #93a1af;
+  background: #fff1f2;
   border-radius: 12px;
   font-size: 0.9rem;
-  color: #2d3436;
-  border-left: 4px solid var(--primary); /* Uses your accent color */
+  color: #4c0519;
+  border-left: 4px solid var(--primary);
   text-align: left;
+}
+
+.disclaimer{
+  text-align: center;
+  margin-bottom: 0;
 }
