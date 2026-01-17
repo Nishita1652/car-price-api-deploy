@@ -301,7 +301,30 @@ select,
   text-align: left;
 }
 
-.disclaimer{
+#disclaimer{
   text-align: center;
   margin-bottom: 0;
+}
+
+.dropdown {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid var(--border); /* Standard light border */
+  background-color: white;
+  color: var(--text-main); /* Deep rose text */
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dropdown:focus {
+  border-color: var(--primary); /* Changes to the crimson/red color */
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1); /* Subtle red outer glow */
+}
+
+.dropdown option {
+  background-color: rgb(192, 189, 189);;
+  color: #333;
 }

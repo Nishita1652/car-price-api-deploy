@@ -9,7 +9,7 @@ const YEARS_LIST = Array.from({ length: 26 }, (_, i) => CURRENT_YEAR - i);
 
 function App() {
   const [formData, setFormData] = useState({
-    brand: '', model: '', year: CURRENT_YEAR, seats: 5,
+    brand: '', model: '', year: CURRENT_YEAR, seats: 4,
     km_driven_input: '', mileage: '', engine: '',
     max_power: '', fuel_type: 'Petrol', transmission_type: 'Manual', seller_type: 'Individual'
   });
@@ -173,7 +173,7 @@ const updatePrice = async (adjustedKm) => {
 
             <div className="form-group">
               <label>Model</label>
-              <select id="model" value={formData.model} onChange={handleInputChange}>
+              <select id="model" className='dropdown' value={formData.model} onChange={handleInputChange}>
                 <option value="">Select Model</option>
                 {(CAR_MODEL_MAPPING[formData.brand] || []).map(m => <option key={m} value={m}>{m}</option>)}
               </select>
@@ -181,14 +181,14 @@ const updatePrice = async (adjustedKm) => {
 
             <div className="form-group">
               <label>Year</label>
-              <select id="year" value={formData.year} onChange={handleInputChange}>
+              <select id="year" className='dropdown' value={formData.year} onChange={handleInputChange}>
                 {YEARS_LIST.map(y => <option key={y} value={y}>{y}</option>)}
               </select>
             </div>
 
-            <div className="form-group"><label>Mileage (kmpl)</label><input type="number" id="mileage" placeholder="eg: 40" onChange={handleInputChange} /></div>
-            <div className="form-group"><label>Engine (CC)</label><input type="number" id="engine" placeholder="eg: 300" onChange={handleInputChange} /></div>
-            <div className="form-group"><label>Max Power (bhp)</label><input type="number" id="max_power" placeholder="eg: 500" onChange={handleInputChange} /></div>
+            <div className="form-group"><label>Mileage (kmpl)</label><input type="number" min={0} id="mileage" placeholder="eg: 40" onChange={handleInputChange} /></div>
+            <div className="form-group"><label>Engine (CC)</label><input type="number" min={0} id="engine" placeholder="eg: 300" onChange={handleInputChange} /></div>
+            <div className="form-group"><label>Max Power (bhp)</label><input type="number" min={0} id="max_power" placeholder="eg: 500" onChange={handleInputChange} /></div>
 
             <div className="form-group">
               <label>Seats</label>
@@ -199,18 +199,18 @@ const updatePrice = async (adjustedKm) => {
               </div>
             </div>
 
-            <div className="form-group full-width"><label>KM Driven</label><input type="number" id="km_driven_input" placeholder="eg: 5000" value={formData.km_driven_input} onChange={handleInputChange} /></div>
+            <div className="form-group full-width"><label>KM Driven</label><input type="number" min={0} step={100} id="km_driven_input" placeholder="eg: 5000" value={formData.km_driven_input} onChange={handleInputChange} /></div>
 
             {/* RESTORED SELLER TYPE */}
             <div className="form-group"><label>Seller Type</label>
-              <select id="seller_type" value={formData.seller_type} onChange={handleInputChange}>
+              <select id="seller_type" className='dropdown' value={formData.seller_type} onChange={handleInputChange}>
                 <option value="Individual">Individual</option>
                 <option value="Dealer">Dealer</option>
               </select>
             </div>
 
             <div className="form-group"><label>Fuel</label>
-              <select id="fuel_type" value={formData.fuel_type} onChange={handleInputChange}>
+              <select id="fuel_type" className='dropdown' value={formData.fuel_type} onChange={handleInputChange}>
                 <option value="Petrol">Petrol</option>
                 <option value="Diesel">Diesel</option>
                 <option value="CNG">CNG</option>
@@ -218,7 +218,7 @@ const updatePrice = async (adjustedKm) => {
               </select>
             </div>
             <div className="form-group full-width"><label>Transmission</label>
-              <select id="transmission_type" value={formData.transmission_type} onChange={handleInputChange}>
+              <select id="dropdown transmission_type" value={formData.transmission_type} onChange={handleInputChange}>
                 <option value="Manual">Manual</option><option value="Automatic">Automatic</option>
               </select>
             </div>
@@ -227,7 +227,7 @@ const updatePrice = async (adjustedKm) => {
           <button className="predict-btn" onClick={getPrediction} disabled={loading}>
             {loading ? 'Analyzing...' : 'Calculate Resale Price'}
           </button>
-          <p className='disclaimer'>First use might take some time</p>
+          <p id='disclaimer'>First use might take some time</p>
         </div>
       </div>
 
