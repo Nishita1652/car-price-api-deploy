@@ -46,7 +46,7 @@ DevOps: Joblib (Model Serialization)
 
 │   └── app.py             # Backend API script
 
-└── frontend/              # React source code
+└── site/              # React source code
 
 
 🧠 Machine Learning Workflow
