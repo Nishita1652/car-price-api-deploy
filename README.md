@@ -1,8 +1,11 @@
 🚗 Used Car Price Predictor
+
 A full-stack machine learning application that predicts the resale value of used cars in India based on various technical and historical parameters. This project combines a robust XGBoost regression pipeline with a responsive React frontend.
 
 👥 The Team
+
 [salmon6934](https://github.com/salmon6934): Frontend Development (React, UI/UX, API Integration
+
 [Nishita1652](https://github.com/Nishita1652): Machine Learning Engineering (Data Cleaning, EDA, Model Training & Pipeline)
 
 🚀 Features
