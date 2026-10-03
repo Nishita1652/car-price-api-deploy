@@ -1,0 +1,31 @@
+services:
+  # 1. FastAPI Machine Learning Microservice
+  - type: web
+    name: car-price-api
+    runtime: docker
+    dockerfilePath: ./car-api-deploy/Dockerfile
+    dockerContext: ./car-api-deploy
+    plan: free
+    region: oregon
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 10000
+
+  # 2. Containerized React Frontend (Vite + Tailwind CSS + Nginx)
+  - type: web
+    name: car-price-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    region: oregon
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: car-price-api
+          property: host
