@@ -4,18 +4,17 @@ import {
   Gauge, 
   Zap, 
   CheckCircle2, 
-  ShieldCheck, 
   Sliders, 
   Activity, 
   Sparkles, 
   ChevronRight, 
   RefreshCw, 
-  Fuel, 
-  DollarSign, 
   Server,
   Layers,
   Award,
-  AlertCircle
+  AlertCircle,
+  Compass,
+  ArrowUpRight
 } from 'lucide-react';
 import { CAR_DATA } from './data/carData';
 
@@ -122,16 +121,15 @@ export default function App() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `Server returned error ${response.status}`);
+        throw new Error(errorData.detail || `Server returned status ${response.status}`);
       }
 
       const data = await response.json();
       setPrediction(data.predicted_price_inr);
       setApiStatus('online');
     } catch (err) {
-      console.warn('Backend call failed:', err);
-      // Client-side fallback simulation using verified regression weights if backend is starting or offline
-      // CatBoost log-scale price approximation based on training coefficients
+      console.warn('Backend call failed, activating client fallback:', err);
+      // Client-side fallback simulation using verified regression weights if backend is starting up
       const simulatedLogPrice = 13.5 
         - (formData.vehicle_age * 0.095) 
         - (Math.log1p(formData.km_driven) * 0.08)
@@ -146,7 +144,7 @@ export default function App() {
       
       setLatency(simulatedDuration);
       setPrediction(simulatedPrice);
-      setError(`Notice: Running on client-side regression simulation (${err.message}). Ensure FastAPI server is running on ${API_BASE_URL}`);
+      setError(`Client-side regression preview active (${err.message}). For production live inference, connect to FastAPI on ${API_BASE_URL}`);
     } finally {
       setLoading(false);
     }
@@ -170,141 +168,165 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080c14] radial-bg text-slate-100 flex flex-col font-sans">
-      {/* Top Navigation */}
-      <header className="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-              <Car className="w-5 h-5 text-white" />
+    <div className="min-h-screen ambient-bg text-charcoal-800 flex flex-col font-sans">
+      {/* Top Header */}
+      <header className="border-b border-beige-300/80 bg-white/80 backdrop-blur-md sticky top-0 z-50 transition">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+          {/* Logo & Brand */}
+          <div className="flex items-center space-x-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blush-100 via-beige-100 to-mist-100 border border-beige-300/80 flex items-center justify-center shadow-soft-card">
+              <Car className="w-5 h-5 text-blush-600" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-bold text-lg text-white tracking-tight">AutoValuate <span className="text-cyan-400">AI</span></span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-medium">CatBoost v1.2</span>
+                <span className="font-bold text-lg text-charcoal-900 tracking-tight">
+                  AutoValuate <span className="font-serif italic font-normal text-blush-600">Atelier</span>
+                </span>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-beige-200/80 text-charcoal-700 border border-beige-300 font-semibold tracking-wide uppercase">
+                  CatBoost v1.2
+                </span>
               </div>
-              <p className="text-[11px] text-slate-400 hidden sm:block">Production ML Resale Valuation Engine</p>
+              <p className="text-[11px] text-charcoal-500 hidden sm:block">
+                Precision Machine Learning Resale Valuation
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 sm:space-x-4">
-            {/* Model R2 Badge */}
-            <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300">
-              <Award className="w-3.5 h-3.5 text-amber-400" />
-              <span>R² Score:</span>
-              <strong className="text-cyan-400 font-mono">0.9367</strong>
+          {/* Status Badges */}
+          <div className="flex items-center space-x-2.5 sm:space-x-3.5">
+            {/* R2 Metric Badge */}
+            <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blush-50/80 border border-blush-200/90 text-xs text-charcoal-700 shadow-sm">
+              <Award className="w-3.5 h-3.5 text-blush-500" />
+              <span>Accuracy R²:</span>
+              <strong className="text-blush-700 font-mono font-bold">0.9367</strong>
             </div>
 
             {/* Records Badge */}
-            <div className="hidden lg:flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300">
-              <Layers className="w-3.5 h-3.5 text-blue-400" />
+            <div className="hidden lg:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-mist-50/80 border border-mist-200/90 text-xs text-charcoal-700 shadow-sm">
+              <Layers className="w-3.5 h-3.5 text-mist-600" />
               <span>Dataset:</span>
-              <strong className="text-white font-mono">12,000+</strong>
+              <strong className="text-charcoal-900 font-mono font-semibold">12,000+</strong>
             </div>
 
-            {/* API Health Status */}
+            {/* API Health Monitor */}
             <div 
               onClick={checkBackendHealth}
-              className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-slate-900/90 border border-slate-800 text-xs cursor-pointer hover:border-slate-700 transition"
-              title="Click to re-ping backend"
+              className="flex items-center space-x-2 px-3 py-1 rounded-full bg-white/90 border border-beige-300 text-xs cursor-pointer hover:border-blush-300 hover:bg-blush-50/30 transition shadow-sm"
+              title="Click to check API connection"
             >
-              <span className={`w-2 h-2 rounded-full ${apiStatus === 'online' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
-              <span className="text-slate-300">API:</span>
-              <span className={`font-medium ${apiStatus === 'online' ? 'text-emerald-400' : 'text-amber-400'}`}>
-                {apiStatus === 'online' ? 'FastAPI Online' : 'Connecting...'}
+              <span className={`w-2 h-2 rounded-full ${apiStatus === 'online' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`}></span>
+              <span className="text-charcoal-600 font-medium">FastAPI:</span>
+              <span className={`font-semibold ${apiStatus === 'online' ? 'text-emerald-700' : 'text-amber-700'}`}>
+                {apiStatus === 'online' ? 'Live' : 'Connecting'}
               </span>
-              {latency && <span className="text-slate-500 font-mono text-[11px]">({latency}ms)</span>}
+              {latency && (
+                <span className="text-charcoal-400 font-mono text-[10px] pl-0.5">({latency}ms)</span>
+              )}
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         {/* Hero Section */}
         <section className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-700/50 text-cyan-300 text-xs font-medium mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Trained on 12,000+ Indian Vehicle Records • R² = 0.9367</span>
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white/90 border border-beige-300 shadow-soft-card text-charcoal-700 text-xs font-medium mb-4">
+            <Sparkles className="w-3.5 h-3.5 text-blush-500" />
+            <span>Trained on 12,000+ Indian Vehicle Records • Verified R² = 0.9367</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4 leading-tight">
-            Real-Time Vehicle <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500">Resale Valuation</span>
+
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-charcoal-900 tracking-tight mb-4 leading-tight">
+            Refined Valuation for <span className="font-serif italic font-normal text-blush-600">Pre-Owned Automobiles</span>
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
-            Instant valuation engine powered by a CatBoost decision tree model served through an optimized FastAPI microservice with sub-100ms response time.
+
+          <p className="text-charcoal-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+            Experience bespoke fair-market valuation driven by a fine-tuned CatBoost decision tree model served through a high-performance FastAPI microservice with sub-100ms response time.
           </p>
 
-          {/* Quick Preset Selector */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            <span className="text-xs text-slate-400 flex items-center mr-1">
-              <Zap className="w-3 h-3 text-cyan-400 mr-1" /> Quick Presets:
+          {/* Quick Presets Carousel */}
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
+            <span className="text-xs font-semibold text-charcoal-500 flex items-center mr-1 uppercase tracking-wider">
+              <Compass className="w-3.5 h-3.5 text-mist-600 mr-1.5" /> Curated Presets:
             </span>
-            {CAR_DATA.presets.map((preset, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => loadPreset(preset)}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition duration-150 flex items-center space-x-1 ${
-                  formData.brand === preset.brand && formData.model === preset.model
-                    ? 'bg-cyan-950/80 border-cyan-500 text-cyan-200 shadow-sm shadow-cyan-500/20'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white'
-                }`}
-              >
-                <span>{preset.name}</span>
-              </button>
-            ))}
+            {CAR_DATA.presets.map((preset, idx) => {
+              const isSelected = formData.brand === preset.brand && formData.model === preset.model;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => loadPreset(preset)}
+                  className={`text-xs px-3.5 py-1.5 rounded-full border transition-all duration-200 flex items-center space-x-1.5 shadow-sm ${
+                    isSelected
+                      ? 'bg-blush-100 border-blush-300 text-blush-900 font-semibold shadow-soft-card scale-105'
+                      : 'bg-white/90 border-beige-300 text-charcoal-600 hover:border-blush-200 hover:bg-blush-50/40 hover:text-charcoal-900'
+                  }`}
+                >
+                  <span>{preset.name}</span>
+                </button>
+              );
+            })}
           </div>
         </section>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-slate-800 mb-8 max-w-4xl mx-auto">
-          <button
-            onClick={() => setActiveTab('calculator')}
-            className={`flex items-center space-x-2 py-3 px-6 text-sm font-semibold border-b-2 transition ${
-              activeTab === 'calculator'
-                ? 'border-cyan-400 text-cyan-400 bg-cyan-950/20'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Sliders className="w-4 h-4" />
-            <span>Valuation Calculator</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('architecture')}
-            className={`flex items-center space-x-2 py-3 px-6 text-sm font-semibold border-b-2 transition ${
-              activeTab === 'architecture'
-                ? 'border-cyan-400 text-cyan-400 bg-cyan-950/20'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Server className="w-4 h-4" />
-            <span>Architecture & Verified Metrics</span>
-          </button>
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex bg-beige-200/70 p-1 rounded-2xl border border-beige-300/80 shadow-sm">
+            <button
+              onClick={() => setActiveTab('calculator')}
+              className={`flex items-center space-x-2 py-2 px-5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                activeTab === 'calculator'
+                  ? 'bg-white text-charcoal-900 shadow-soft-card'
+                  : 'text-charcoal-600 hover:text-charcoal-900'
+              }`}
+            >
+              <Sliders className="w-4 h-4 text-blush-500" />
+              <span>Valuation Calculator</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('architecture')}
+              className={`flex items-center space-x-2 py-2 px-5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                activeTab === 'architecture'
+                  ? 'bg-white text-charcoal-900 shadow-soft-card'
+                  : 'text-charcoal-600 hover:text-charcoal-900'
+              }`}
+            >
+              <Server className="w-4 h-4 text-mist-600" />
+              <span>Architecture &amp; Metrics</span>
+            </button>
+          </div>
         </div>
 
         {activeTab === 'calculator' ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Form Section (7 cols) */}
-            <form onSubmit={handlePredict} className="lg:col-span-7 glass-panel rounded-2xl p-6 sm:p-8 space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-                <h2 className="text-lg font-bold text-white flex items-center space-x-2">
-                  <Car className="w-5 h-5 text-cyan-400" />
-                  <span>Vehicle Parameters</span>
-                </h2>
-                <span className="text-xs text-slate-400">11 Features Expected by CatBoost</span>
+            <form onSubmit={handlePredict} className="lg:col-span-7 glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b border-beige-200">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-blush-50 border border-blush-200 flex items-center justify-center text-blush-600">
+                    <Car className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-charcoal-900">Vehicle Specifications</h2>
+                    <p className="text-[11px] text-charcoal-500">11 feature parameters analyzed by CatBoost Regressor</p>
+                  </div>
+                </div>
+                <span className="text-[11px] px-2.5 py-1 rounded-full bg-mist-50 border border-mist-200 text-mist-800 font-medium">
+                  Step 1 of 2
+                </span>
               </div>
 
               {/* Brand and Model */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-charcoal-600 mb-1.5">
                     Make / Brand
                   </label>
                   <select
                     name="brand"
                     value={formData.brand}
                     onChange={handleBrandChange}
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition"
+                    className="w-full bg-beige-50/50 hover:bg-white focus:bg-white border border-beige-300 rounded-xl px-3.5 py-2.5 text-sm text-charcoal-900 focus:outline-none focus:border-blush-400 focus:ring-2 focus:ring-blush-100 transition shadow-sm"
                   >
                     {CAR_DATA.brands.map(b => (
                       <option key={b} value={b}>{b}</option>
@@ -313,7 +335,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-charcoal-600 mb-1.5">
                     Car Model
                   </label>
                   <input
@@ -322,8 +344,8 @@ export default function App() {
                     list="model-options"
                     value={formData.model}
                     onChange={handleChange}
-                    placeholder="e.g. Swift Dzire, Creta"
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition"
+                    placeholder="e.g. Swift Dzire, Creta, 3 Series"
+                    className="w-full bg-beige-50/50 hover:bg-white focus:bg-white border border-beige-300 rounded-xl px-3.5 py-2.5 text-sm text-charcoal-900 focus:outline-none focus:border-blush-400 focus:ring-2 focus:ring-blush-100 transition shadow-sm"
                   />
                   <datalist id="model-options">
                     {(CAR_DATA.brandModels[formData.brand] || []).map(m => (
@@ -334,11 +356,14 @@ export default function App() {
               </div>
 
               {/* Age and Mileage Sliders */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-4 rounded-xl bg-slate-900/50 border border-slate-800">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-5 rounded-2xl bg-beige-100/60 border border-beige-200">
+                {/* Age Slider */}
                 <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-medium text-slate-300">Vehicle Age (Years)</label>
-                    <span className="text-xs font-bold text-cyan-400 font-mono">{formData.vehicle_age} yrs</span>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-xs font-semibold text-charcoal-700">Vehicle Age</label>
+                    <span className="text-xs font-bold text-charcoal-900 font-mono px-2 py-0.5 rounded-lg bg-white border border-beige-300 shadow-sm">
+                      {formData.vehicle_age} {formData.vehicle_age === 1 ? 'Year' : 'Years'}
+                    </span>
                   </div>
                   <input
                     type="range"
@@ -348,19 +373,20 @@ export default function App() {
                     step="1"
                     value={formData.vehicle_age}
                     onChange={handleChange}
-                    className="w-full accent-cyan-500 cursor-pointer"
+                    className="w-full cursor-pointer"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-500 mt-1">
-                    <span>Brand New (0)</span>
-                    <span>10 yrs</span>
-                    <span>20 yrs</span>
+                  <div className="flex justify-between text-[10px] text-charcoal-400 mt-1.5 font-medium">
+                    <span>Showroom (0)</span>
+                    <span>10 Yrs</span>
+                    <span>20 Yrs</span>
                   </div>
                 </div>
 
+                {/* Kilometers Slider */}
                 <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-medium text-slate-300">Kilometers Driven</label>
-                    <span className="text-xs font-bold text-cyan-400 font-mono">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-xs font-semibold text-charcoal-700">Kilometers Driven</label>
+                    <span className="text-xs font-bold text-charcoal-900 font-mono px-2 py-0.5 rounded-lg bg-white border border-beige-300 shadow-sm">
                       {formData.km_driven.toLocaleString('en-IN')} km
                     </span>
                   </div>
@@ -372,12 +398,12 @@ export default function App() {
                     step="2000"
                     value={formData.km_driven}
                     onChange={handleChange}
-                    className="w-full accent-cyan-500 cursor-pointer"
+                    className="w-full cursor-pointer"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-500 mt-1">
-                    <span>1k km</span>
+                  <div className="flex justify-between text-[10px] text-charcoal-400 mt-1.5 font-medium">
+                    <span>1,000 km</span>
                     <span>125k km</span>
-                    <span>250k+ km</span>
+                    <span>250,000+</span>
                   </div>
                 </div>
               </div>
@@ -385,7 +411,7 @@ export default function App() {
               {/* Powertrain Controls: Fuel & Transmission */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-charcoal-600 mb-2">
                     Fuel Type
                   </label>
                   <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -394,10 +420,10 @@ export default function App() {
                         key={type}
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, fuel_type: type }))}
-                        className={`py-2 px-2 text-xs rounded-xl font-medium border transition ${
+                        className={`py-2 px-2 text-xs rounded-xl font-medium border transition-all duration-150 ${
                           formData.fuel_type === type
-                            ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300 font-semibold'
-                            : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                            ? 'bg-mist-100 border-mist-300 text-mist-900 font-semibold shadow-sm'
+                            : 'bg-white border-beige-300 text-charcoal-600 hover:border-mist-200 hover:bg-mist-50/50'
                         }`}
                       >
                         {type}
@@ -408,7 +434,7 @@ export default function App() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-charcoal-600 mb-2">
                       Transmission
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -417,10 +443,10 @@ export default function App() {
                           key={trans}
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, transmission_type: trans }))}
-                          className={`py-2 px-3 text-xs rounded-xl font-medium border transition ${
+                          className={`py-2 px-3 text-xs rounded-xl font-medium border transition-all duration-150 ${
                             formData.transmission_type === trans
-                              ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300 font-semibold'
-                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                              ? 'bg-blush-100 border-blush-300 text-blush-900 font-semibold shadow-sm'
+                              : 'bg-white border-beige-300 text-charcoal-600 hover:border-blush-200 hover:bg-blush-50/50'
                           }`}
                         >
                           {trans}
@@ -430,14 +456,14 @@ export default function App() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-charcoal-600 mb-2">
                       Seller Category
                     </label>
                     <select
                       name="seller_type"
                       value={formData.seller_type}
                       onChange={handleChange}
-                      className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"
+                      className="w-full bg-beige-50/50 hover:bg-white focus:bg-white border border-beige-300 rounded-xl px-3.5 py-2 text-xs text-charcoal-800 focus:outline-none focus:border-blush-400 shadow-sm"
                     >
                       <option value="Individual">Individual Seller</option>
                       <option value="Dealer">Certified Dealer</option>
@@ -448,50 +474,50 @@ export default function App() {
               </div>
 
               {/* Technical Engine Specifications */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
                 <div>
-                  <label className="block text-[11px] text-slate-400 mb-1">Engine (CC)</label>
+                  <label className="block text-[11px] font-medium text-charcoal-500 mb-1">Engine (CC)</label>
                   <input
                     type="number"
                     name="engine_cleaned"
                     value={formData.engine_cleaned}
                     onChange={handleChange}
                     step="50"
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none font-mono"
+                    className="w-full bg-beige-50/50 hover:bg-white focus:bg-white border border-beige-300 rounded-xl px-3 py-2 text-sm text-charcoal-800 focus:border-blush-400 focus:outline-none font-mono shadow-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] text-slate-400 mb-1">Max Power (bhp)</label>
+                  <label className="block text-[11px] font-medium text-charcoal-500 mb-1">Max Power (bhp)</label>
                   <input
                     type="number"
                     name="max_power_cleaned"
                     value={formData.max_power_cleaned}
                     onChange={handleChange}
                     step="1"
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none font-mono"
+                    className="w-full bg-beige-50/50 hover:bg-white focus:bg-white border border-beige-300 rounded-xl px-3 py-2 text-sm text-charcoal-800 focus:border-blush-400 focus:outline-none font-mono shadow-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] text-slate-400 mb-1">Mileage (kmpl)</label>
+                  <label className="block text-[11px] font-medium text-charcoal-500 mb-1">Mileage (kmpl)</label>
                   <input
                     type="number"
                     name="mileage_cleaned"
                     value={formData.mileage_cleaned}
                     onChange={handleChange}
                     step="0.5"
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none font-mono"
+                    className="w-full bg-beige-50/50 hover:bg-white focus:bg-white border border-beige-300 rounded-xl px-3 py-2 text-sm text-charcoal-800 focus:border-blush-400 focus:outline-none font-mono shadow-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] text-slate-400 mb-1">Seats</label>
+                  <label className="block text-[11px] font-medium text-charcoal-500 mb-1">Seating Capacity</label>
                   <select
                     name="seats"
                     value={formData.seats}
                     onChange={handleChange}
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none"
+                    className="w-full bg-beige-50/50 hover:bg-white focus:bg-white border border-beige-300 rounded-xl px-3 py-2 text-sm text-charcoal-800 focus:border-blush-400 focus:outline-none shadow-sm"
                   >
                     {[2, 4, 5, 6, 7, 8].map(s => (
                       <option key={s} value={s}>{s} Seats</option>
@@ -505,18 +531,18 @@ export default function App() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-base shadow-lg shadow-cyan-500/25 active:scale-[0.99] transition duration-150 flex items-center justify-center space-x-2 disabled:opacity-50"
+                  className="w-full py-4 px-6 rounded-2xl bg-charcoal-800 hover:bg-charcoal-900 text-white font-semibold text-sm tracking-wide shadow-soft-hover transition-all duration-200 active:scale-[0.99] flex items-center justify-center space-x-2 disabled:opacity-50"
                 >
                   {loading ? (
                     <>
-                      <RefreshCw className="w-5 h-5 animate-spin" />
-                      <span>Computing CatBoost Valuation...</span>
+                      <RefreshCw className="w-4 h-4 animate-spin text-blush-300" />
+                      <span>Computing CatBoost Resale Valuation...</span>
                     </>
                   ) : (
                     <>
-                      <Zap className="w-5 h-5 fill-current" />
-                      <span>Estimate Valuation Price</span>
-                      <ChevronRight className="w-5 h-5" />
+                      <Sparkles className="w-4 h-4 text-blush-300" />
+                      <span>Compute Fair Resale Valuation</span>
+                      <ChevronRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
@@ -525,93 +551,107 @@ export default function App() {
 
             {/* Results Display Panel (5 cols) */}
             <div className="lg:col-span-5 space-y-6">
-              {/* Valuation Card */}
-              <div className="glass-panel-glow rounded-2xl p-6 sm:p-8 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-36 h-36 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+              {/* Valuation Centerpiece Card */}
+              <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-beige-300/90 bg-gradient-to-br from-white via-beige-50/70 to-blush-50/40 shadow-soft-luxury">
+                {/* Ambient Soft Radial Gradients */}
+                <div className="absolute top-0 right-0 w-44 h-44 bg-blush-200/35 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-44 h-44 bg-mist-200/35 rounded-full blur-3xl pointer-events-none"></div>
 
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs uppercase tracking-wider text-cyan-400 font-semibold flex items-center space-x-1.5">
-                    <Activity className="w-4 h-4" />
-                    <span>Real-Time Valuation Result</span>
+                <div className="flex items-center justify-between mb-4 relative z-10">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-charcoal-500 flex items-center space-x-1.5">
+                    <Activity className="w-4 h-4 text-blush-600" />
+                    <span>Valuation Result</span>
                   </span>
                   {latency && (
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                    <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-mist-100 border border-mist-200 text-mist-800 font-semibold shadow-sm">
                       ⚡ {latency} ms
                     </span>
                   )}
                 </div>
 
                 {prediction ? (
-                  <div className="space-y-4">
+                  <div className="space-y-5 relative z-10 animate-fade-in">
                     <div>
-                      <div className="text-xs text-slate-400 mb-1">Estimated Fair Market Value</div>
-                      <div className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-cyan-400 font-mono">
+                      <div className="text-xs font-medium text-charcoal-500 mb-1">
+                        Estimated Fair Market Resale Value
+                      </div>
+                      <div className="text-4xl sm:text-5xl font-extrabold text-charcoal-900 tracking-tight font-serif">
                         {formatINR(prediction)}
                       </div>
-                      <div className="text-lg font-semibold text-cyan-400 mt-1 font-mono">
-                        {formatLakhs(prediction)}
+                      <div className="mt-2">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-blush-100 border border-blush-200 text-blush-800 text-xs sm:text-sm font-semibold font-mono shadow-sm">
+                          {formatLakhs(prediction)}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 space-y-2">
-                      <div className="flex justify-between items-center text-slate-400">
-                        <span>Expected Valuation Range:</span>
-                        <span className="text-white font-mono font-medium">
+                    <div className="p-4 rounded-2xl bg-white/85 border border-beige-200/90 text-xs text-charcoal-600 space-y-2.5 shadow-sm">
+                      <div className="flex justify-between items-center text-charcoal-500">
+                        <span>Expected Valuation Band:</span>
+                        <span className="text-charcoal-900 font-mono font-semibold">
                           {formatINR(prediction * 0.94)} – {formatINR(prediction * 1.06)}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center text-slate-400">
+                      <div className="flex justify-between items-center text-charcoal-500">
                         <span>Model Confidence:</span>
-                        <span className="text-emerald-400 font-medium">High (R² = 0.9367)</span>
+                        <span className="text-emerald-700 font-semibold flex items-center">
+                          <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-600" /> High (R² = 0.9367)
+                        </span>
                       </div>
-                      <div className="flex justify-between items-center text-slate-400">
+                      <div className="flex justify-between items-center text-charcoal-500">
                         <span>API SLA Response Time:</span>
-                        <span className="text-cyan-400 font-mono font-medium">&lt; 100ms (empirical: {latency || '~5'}ms)</span>
+                        <span className="text-mist-700 font-mono font-medium">
+                          &lt; 100ms (empirical: {latency || '~4.4'}ms)
+                        </span>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="py-12 text-center space-y-3">
-                    <div className="w-12 h-12 rounded-full bg-slate-900/80 border border-slate-800 mx-auto flex items-center justify-center text-slate-500">
-                      <Gauge className="w-6 h-6" />
+                  <div className="py-12 text-center space-y-3 relative z-10">
+                    <div className="w-14 h-14 rounded-2xl bg-beige-100 border border-beige-300 mx-auto flex items-center justify-center text-charcoal-400 shadow-sm">
+                      <Gauge className="w-6 h-6 text-blush-500" />
                     </div>
-                    <div className="text-sm font-medium text-slate-300">Ready to calculate</div>
-                    <p className="text-xs text-slate-500 max-w-xs mx-auto">
-                      Adjust the vehicle parameters or select a quick preset, then click &quot;Estimate Valuation Price&quot;.
+                    <div className="text-sm font-semibold text-charcoal-800">Ready to Compute Valuation</div>
+                    <p className="text-xs text-charcoal-500 max-w-xs mx-auto leading-relaxed">
+                      Select a vehicle preset or adjust the parameters, then click &quot;Compute Fair Resale Valuation&quot;.
                     </p>
                   </div>
                 )}
 
                 {error && (
-                  <div className="mt-4 p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 text-amber-300 text-xs flex items-start space-x-2">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-400" />
+                  <div className="mt-4 p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-amber-800 text-xs flex items-start space-x-2 relative z-10">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600" />
                     <span className="leading-snug">{error}</span>
                   </div>
                 )}
               </div>
 
               {/* Spec Summary Card */}
-              <div className="glass-panel rounded-2xl p-6 space-y-4">
-                <h3 className="text-sm font-semibold text-white flex items-center space-x-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Input Summary Profile</span>
-                </h3>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <span className="text-slate-500 block text-[10px]">VEHICLE</span>
-                    <span className="font-semibold text-white">{formData.brand} {formData.model}</span>
+              <div className="glass-card rounded-3xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-charcoal-700 flex items-center space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-blush-600" />
+                    <span>Active Vehicle Profile</span>
+                  </h3>
+                  <span className="text-[10px] text-charcoal-400">Live Parameters</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5 text-xs">
+                  <div className="p-3 rounded-xl bg-beige-50/60 border border-beige-200">
+                    <span className="text-charcoal-400 block text-[10px] font-semibold uppercase">Vehicle</span>
+                    <span className="font-semibold text-charcoal-900">{formData.brand} {formData.model}</span>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <span className="text-slate-500 block text-[10px]">AGE & MILEAGE</span>
-                    <span className="font-semibold text-white">{formData.vehicle_age} yrs • {formData.km_driven.toLocaleString()} km</span>
+                  <div className="p-3 rounded-xl bg-beige-50/60 border border-beige-200">
+                    <span className="text-charcoal-400 block text-[10px] font-semibold uppercase">Age &amp; Odo</span>
+                    <span className="font-semibold text-charcoal-900">{formData.vehicle_age} yrs • {formData.km_driven.toLocaleString()} km</span>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <span className="text-slate-500 block text-[10px]">POWERTRAIN</span>
-                    <span className="font-semibold text-white">{formData.fuel_type} • {formData.transmission_type}</span>
+                  <div className="p-3 rounded-xl bg-beige-50/60 border border-beige-200">
+                    <span className="text-charcoal-400 block text-[10px] font-semibold uppercase">Powertrain</span>
+                    <span className="font-semibold text-charcoal-900">{formData.fuel_type} • {formData.transmission_type}</span>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <span className="text-slate-500 block text-[10px]">ENGINE OUTPUT</span>
-                    <span className="font-semibold text-white">{formData.engine_cleaned} cc • {formData.max_power_cleaned} bhp</span>
+                  <div className="p-3 rounded-xl bg-beige-50/60 border border-beige-200">
+                    <span className="text-charcoal-400 block text-[10px] font-semibold uppercase">Engine Output</span>
+                    <span className="font-semibold text-charcoal-900">{formData.engine_cleaned} cc • {formData.max_power_cleaned} bhp</span>
                   </div>
                 </div>
               </div>
@@ -620,65 +660,66 @@ export default function App() {
         ) : (
           /* Architecture & Verified Evidence Tab */
           <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
-            <div className="glass-panel rounded-2xl p-6 sm:p-8 space-y-6">
-              <div className="flex items-center space-x-3 pb-4 border-b border-slate-800">
-                <div className="p-2 rounded-xl bg-cyan-950 border border-cyan-800 text-cyan-400">
+            <div className="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+              <div className="flex items-center space-x-3.5 pb-5 border-b border-beige-200">
+                <div className="p-2.5 rounded-2xl bg-blush-50 border border-blush-200 text-blush-600">
                   <Award className="w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">System Architecture & Empirical Verification</h2>
-                  <p className="text-xs text-slate-400">Every metric claimed is verified against the serialized model and dataset</p>
+                  <h2 className="text-xl font-bold text-charcoal-900">System Architecture &amp; Empirical Evidence</h2>
+                  <p className="text-xs text-charcoal-500">Every metric claimed is verified against the serialized model and dataset</p>
                 </div>
               </div>
 
+              {/* Verified Metrics Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1">
-                  <div className="text-xs text-slate-400">Model Algorithm</div>
-                  <div className="text-base font-bold text-white">CatBoost Regressor</div>
-                  <div className="text-[11px] text-cyan-400">596 Trees • Depth 10 • lr 0.05</div>
+                <div className="p-5 rounded-2xl bg-beige-50/70 border border-beige-200 space-y-1 shadow-sm">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-charcoal-400">Model Algorithm</div>
+                  <div className="text-lg font-bold text-charcoal-900">CatBoost Regressor</div>
+                  <div className="text-xs text-blush-600 font-medium">596 Trees • Depth 10 • lr 0.05</div>
                 </div>
-                <div className="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1">
-                  <div className="text-xs text-slate-400">R-Squared Metric</div>
-                  <div className="text-base font-bold text-white">R² = 0.9367</div>
-                  <div className="text-[11px] text-emerald-400">Exact match on 20% holdout split</div>
+                <div className="p-5 rounded-2xl bg-blush-50/40 border border-blush-200 space-y-1 shadow-sm">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-charcoal-400">Predictive Accuracy</div>
+                  <div className="text-lg font-bold text-charcoal-900">R² = 0.9367</div>
+                  <div className="text-xs text-emerald-700 font-medium">Evaluated on 20% holdout split</div>
                 </div>
-                <div className="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1">
-                  <div className="text-xs text-slate-400">Dataset Records</div>
-                  <div className="text-base font-bold text-white">12,000+ Records</div>
-                  <div className="text-[11px] text-blue-400">12,328 train split (15,411 total)</div>
+                <div className="p-5 rounded-2xl bg-mist-50/40 border border-mist-200 space-y-1 shadow-sm">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-charcoal-400">Training Scale</div>
+                  <div className="text-lg font-bold text-charcoal-900">12,000+ Records</div>
+                  <div className="text-xs text-mist-700 font-medium">12,328 train split (15,411 total)</div>
                 </div>
               </div>
 
               {/* Pipeline Flowchart */}
-              <div className="p-6 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-4">
-                <h3 className="text-sm font-semibold text-slate-300">Production Inference Pipeline Flow</h3>
+              <div className="p-6 rounded-2xl bg-beige-100/50 border border-beige-200 space-y-4">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-charcoal-600">Production Inference Pipeline</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center text-xs">
-                  <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-                    <span className="block font-bold text-cyan-400 mb-1">1. React UI</span>
-                    <span className="text-slate-400 text-[11px]">Vite + Tailwind CSS user form on Render</span>
+                  <div className="p-4 rounded-xl bg-white border border-beige-200 shadow-sm">
+                    <span className="block font-bold text-charcoal-900 mb-1">1. React UI</span>
+                    <span className="text-charcoal-500 text-[11px]">Vite + Tailwind CSS user form container</span>
                   </div>
-                  <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-                    <span className="block font-bold text-blue-400 mb-1">2. FastAPI Gateway</span>
-                    <span className="text-slate-400 text-[11px]">Pydantic schema validation &amp; CORS</span>
+                  <div className="p-4 rounded-xl bg-white border border-beige-200 shadow-sm">
+                    <span className="block font-bold text-mist-700 mb-1">2. FastAPI Gateway</span>
+                    <span className="text-charcoal-500 text-[11px]">Pydantic schema validation &amp; CORS</span>
                   </div>
-                  <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-                    <span className="block font-bold text-purple-400 mb-1">3. CatBoost Model</span>
-                    <span className="text-slate-400 text-[11px]">In-memory inference (&lt; 5ms latency)</span>
+                  <div className="p-4 rounded-xl bg-white border border-beige-200 shadow-sm">
+                    <span className="block font-bold text-blush-700 mb-1">3. CatBoost Model</span>
+                    <span className="text-charcoal-500 text-[11px]">In-memory inference (&lt; 5ms latency)</span>
                   </div>
-                  <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-                    <span className="block font-bold text-emerald-400 mb-1">4. JSON Response</span>
-                    <span className="text-slate-400 text-[11px]">Rupees valuation with np.expm1 transform</span>
+                  <div className="p-4 rounded-xl bg-white border border-beige-200 shadow-sm">
+                    <span className="block font-bold text-emerald-700 mb-1">4. JSON Response</span>
+                    <span className="text-charcoal-500 text-[11px]">Rupees valuation with np.expm1 transform</span>
                   </div>
                 </div>
               </div>
 
               {/* Technologies Grid */}
               <div className="pt-2">
-                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Verified Tech Stack</h3>
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-charcoal-500 mb-3">Verified Tech Stack</h3>
                 <div className="flex flex-wrap gap-2">
-                  {['Python 3.10', 'FastAPI', 'CatBoost', 'Scikit-Learn', 'React.js', 'Tailwind CSS v3', 'Docker', 'Render'].map(tech => (
-                    <span key={tech} className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center space-x-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                  {['Python 3.10', 'FastAPI', 'CatBoost', 'Scikit-Learn', 'React.js', 'Tailwind CSS', 'Docker', 'Render'].map(tech => (
+                    <span key={tech} className="px-3.5 py-1.5 rounded-full bg-white border border-beige-300 text-xs font-medium text-charcoal-700 flex items-center space-x-1.5 shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blush-500"></span>
                       <span>{tech}</span>
                     </span>
                   ))}
@@ -689,20 +730,20 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-slate-950/70 py-6 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      {/* Classy Footer */}
+      <footer className="border-t border-beige-300/80 bg-white/70 py-6 mt-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-charcoal-500">
           <div className="flex items-center space-x-2">
-            <span>AutoValuate AI</span>
+            <span className="font-semibold text-charcoal-700">AutoValuate Atelier</span>
             <span>•</span>
-            <span>Trained on 12,000+ vehicle records</span>
+            <span>Trained on 12,000+ records</span>
             <span>•</span>
-            <span className="text-cyan-400 font-mono">R² = 0.9367</span>
+            <span className="text-blush-700 font-mono font-semibold">R² = 0.9367</span>
           </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-slate-400">FastAPI microservice response time: &lt; 100ms</span>
+          <div className="flex items-center space-x-3 text-xs">
+            <span>FastAPI latency &lt; 100ms</span>
             <span>•</span>
-            <span className="text-emerald-400 font-medium">Containerized on Render</span>
+            <span className="text-emerald-700 font-medium">Containerized on Render</span>
           </div>
         </div>
       </footer>

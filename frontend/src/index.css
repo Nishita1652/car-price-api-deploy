@@ -1,57 +1,109 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   margin: 0;
-  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #080c14;
-  color: #f1f5f9;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #FAF7F2;
+  color: #1F2428;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0f17;
+  background: #FAF7F2;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
+  background: #DED5C9;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #C8BBAA;
 }
 
-/* Glassmorphic utilities */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.glass-panel-glow {
-  background: rgba(15, 23, 42, 0.8);
+/* Elegant Luxury Cards & Glassmorphism */
+.glass-card {
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(6, 182, 212, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(234, 228, 220, 0.85);
+  box-shadow: 0 10px 30px -4px rgba(45, 38, 32, 0.05), 0 4px 12px -2px rgba(45, 38, 32, 0.02);
 }
 
-.radial-bg {
+.glass-card-interactive {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(234, 228, 220, 0.9);
+  box-shadow: 0 10px 30px -4px rgba(45, 38, 32, 0.05);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-interactive:hover {
+  border-color: rgba(248, 210, 219, 0.9);
+  box-shadow: 0 16px 36px -6px rgba(45, 38, 32, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Ambient Radial Background with Warm Beige, Soft Blush & Mist Blue */
+.ambient-bg {
+  background-color: #FAF7F2;
   background-image: 
-    radial-gradient(at 10% 20%, rgba(6, 182, 212, 0.12) 0px, transparent 50%),
-    radial-gradient(at 90% 10%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
-    radial-gradient(at 50% 80%, rgba(14, 165, 233, 0.08) 0px, transparent 50%);
+    radial-gradient(at 15% 10%, rgba(252, 231, 236, 0.7) 0px, transparent 45%),
+    radial-gradient(at 85% 15%, rgba(234, 241, 246, 0.7) 0px, transparent 45%),
+    radial-gradient(at 50% 60%, rgba(244, 239, 234, 0.8) 0px, transparent 60%),
+    radial-gradient(at 80% 85%, rgba(253, 242, 244, 0.5) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Custom Minimalist Luxury Slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: #EAE4DC;
+  border-radius: 9999px;
+  outline: none;
+  transition: background 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1E252B;
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 2px 8px rgba(30, 37, 43, 0.25);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: #BA5369;
+  box-shadow: 0 4px 12px rgba(186, 83, 105, 0.35);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1E252B;
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 2px 8px rgba(30, 37, 43, 0.25);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
 }

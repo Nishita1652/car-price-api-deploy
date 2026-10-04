@@ -41,24 +41,24 @@ A full-stack machine learning application and production microservice architectu
 
 ```text
 car_prediction_model/
-├── car-api-deploy/                 # FastAPI ML Microservice
+├── car-api-deploy/                 # FastAPI Machine Learning Microservice
 │   ├── Dockerfile                  # Container definition for Python/FastAPI
 │   ├── api_server.py               # REST API endpoints (/predict/, /selling_price, /model-info)
 │   ├── best_car_price_model.pkl    # Serialized CatBoost regression model (9.5MB)
-│   └── requirements.txt            # Python dependencies
-├── frontend/                       # Modern Containerized React Frontend
-│   ├── Dockerfile                  # Multi-stage build (Node -> Nginx Alpine)
-│   ├── nginx.conf.template         # Nginx dynamic port template
-│   ├── package.json                # Dependencies (React 19, Tailwind CSS, Lucide)
-│   ├── tailwind.config.js          # Tailwind theme and styling tokens
+│   ├── requirements.txt            # Python dependencies
+│   └── .dockerignore               # Docker build exclusions
+├── frontend/                       # Containerized React 19 + Tailwind CSS Frontend
+│   ├── Dockerfile                  # Multi-stage production build (Node 22 -> Nginx Alpine)
+│   ├── nginx.conf.template         # Nginx dynamic port template for cloud routing
+│   ├── package.json                # Dependencies (React 19, Tailwind CSS, Lucide Icons)
+│   ├── tailwind.config.js          # Tailored luxury aesthetic tokens (beige, blush, mist, charcoal)
 │   ├── vite.config.js              # Vite bundler configuration
-│   └── src/                        # React components and valuation engine
+│   └── src/                        # React components, valuation calculator, and presets
+├── data/                           # Verified Machine Learning Data
+│   └── cleaned_cardekho_dataset.csv # 15,411 preprocessed vehicle records
 ├── render.yaml                     # Render Infrastructure-as-Code Blueprint
-├── cardekho_dataset.csv            # Raw dataset
-├── cleaned_cardekho_dataset.csv    # Preprocessed dataset (15,411 rows)
-├── Dockerfile                      # Root Dockerfile for direct container deploys
-├── api_server.py                   # Root FastAPI entrypoint
-└── requirements.txt                # Root requirements
+├── README.md                       # Architecture & deployment documentation
+└── .gitignore                      # Version control exclusion rules
 ```
 
 ---
