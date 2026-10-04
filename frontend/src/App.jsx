@@ -159,9 +159,6 @@ export default function App() {
                 <span className="font-bold text-lg text-charcoal-900 tracking-tight">
                   AutoValuate
                 </span>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-blush-50 text-blush-700 border border-blush-200/80 font-semibold tracking-wide uppercase">
-                  Free Valuation
-                </span>
               </div>
               <p className="text-[11px] text-charcoal-500 hidden sm:block">
                 Instant Used Car Resale Pricing
@@ -186,19 +183,10 @@ export default function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         {/* Hero Section */}
-        <section className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white/90 border border-beige-300 shadow-soft-card text-charcoal-700 text-xs font-medium mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-blush-500" />
-            <span>Instant Market Price Estimator • Accurate &amp; 100% Free</span>
-          </div>
-
+        <section className="text-center max-w-3xl mx-auto mb-8">
           <h1 className="text-3xl sm:text-5xl font-extrabold text-charcoal-900 tracking-tight mb-4 leading-tight">
             Find Out What Your Car is <span className="font-serif italic font-normal text-blush-600">Really Worth</span>
           </h1>
-
-          <p className="text-charcoal-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
-            Get an instant, fair resale valuation based on real Indian market trends, age, mileage, and vehicle condition before buying or selling.
-          </p>
 
           {/* Quick Presets Carousel */}
           <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
